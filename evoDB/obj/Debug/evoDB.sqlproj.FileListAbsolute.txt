@@ -1,0 +1,5 @@
+/workspaces/ProjectEvo/evoDB/bin/Debug/evoDB.dacpac
+/workspaces/ProjectEvo/evoDB/obj/Debug/Model.xml
+/workspaces/ProjectEvo/evoDB/obj/Debug/refactor.xml
+/workspaces/ProjectEvo/evoDB/obj/Debug/postdeploy.sql
+/workspaces/ProjectEvo/evoDB/obj/Debug/predeploy.sql
