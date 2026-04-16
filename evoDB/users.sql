@@ -1,4 +1,5 @@
 CREATE TABLE [dbo].[users]
 (
-  [Id] INT NOT NULL PRIMARY KEY
+  [Username] NVARCHAR(255) NOT NULL PRIMARY KEY,
+  [PasswordHash] NVARCHAR(255) NOT NULL
 )
