@@ -1,0 +1,144 @@
+copy and paste this into your mysql
+use ALTER TABLE to change anything you need to just paste it at the end of this file Thanks!
+
+
+
+CREATE DATABASE IF NOT EXISTS evoDB;
+USE evoDB;
+
+-- ADMIN
+CREATE TABLE admin (
+    username VARCHAR(50)  NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    PRIMARY KEY (username)
+);
+
+INSERT INTO admin (username, password)
+VALUES ('admin', ('admin123'));
+
+-- USERS (Account in diagram)
+CREATE TABLE users (
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    PRIMARY KEY (username)
+);
+
+-- SPECIES
+CREATE TABLE species (
+    id   INT          NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- MUTATION
+CREATE TABLE mutation (
+    id       INT          NOT NULL AUTO_INCREMENT,
+    name     VARCHAR(100) NOT NULL,
+    is_valid TINYINT(1)   NOT NULL DEFAULT 1,
+    PRIMARY KEY (id)
+);
+
+-- SPECIES <-> MUTATION (many-to-many)
+CREATE TABLE species_mutation (
+    species_id  INT NOT NULL,
+    mutation_id INT NOT NULL,
+    PRIMARY KEY (species_id, mutation_id),
+    FOREIGN KEY (species_id)  REFERENCES species  (id),
+    FOREIGN KEY (mutation_id) REFERENCES mutation (id)
+);
+
+
+
+-- LEADERBOARD ENTRY
+CREATE TABLE leaderboard_entry (
+    id             INT          NOT NULL AUTO_INCREMENT,
+    name           VARCHAR(255) NOT NULL,
+    score          INT          NOT NULL DEFAULT 0,
+    species_id     INT          NOT NULL,
+    level          INT          NOT NULL DEFAULT 1,
+    username       VARCHAR(255) NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (species_id)     REFERENCES species      (id),
+    FOREIGN KEY (username)       REFERENCES users        (username)
+);
+
+-- ENVIRONMENT
+CREATE TABLE environment (
+    id     INT NOT NULL AUTO_INCREMENT,
+    length INT NOT NULL DEFAULT 0,
+    width  INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (id)
+);
+
+-- TILE (many per environment)
+CREATE TABLE tile (
+    id             INT         NOT NULL AUTO_INCREMENT,
+    environment_id INT         NOT NULL,
+    position_x     INT         NOT NULL DEFAULT 0,
+    position_y     INT         NOT NULL DEFAULT 0,
+    tile_type      VARCHAR(50) NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (environment_id) REFERENCES environment (id)
+);
+
+-- ANIMAL
+CREATE TABLE animal (
+    id             INT    NOT NULL AUTO_INCREMENT,
+    environment_id INT    NOT NULL,
+    hp             INT    NOT NULL DEFAULT 100,
+    hunger         DOUBLE NOT NULL DEFAULT 0.0,
+    gender         TINYINT(1) NOT NULL DEFAULT 1, -- 1 = male, 0 = female
+    PRIMARY KEY (id),
+    FOREIGN KEY (environment_id) REFERENCES environment (id)
+);
+
+-- ANIMAL <-> MUTATION (many-to-many)
+CREATE TABLE animal_mutation (
+    animal_id   INT NOT NULL,
+    mutation_id INT NOT NULL,
+    PRIMARY KEY (animal_id, mutation_id),
+    FOREIGN KEY (animal_id)   REFERENCES animal   (id),
+    FOREIGN KEY (mutation_id) REFERENCES mutation (id)
+);
+
+
+
+
+-- SAVED GAME
+CREATE TABLE saved_game (
+    id               INT          NOT NULL AUTO_INCREMENT,
+    username         VARCHAR(255) NOT NULL,
+    current_level    INT          NOT NULL DEFAULT 1,
+    selected_species INT          NOT NULL,
+    saved_at         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (username)         REFERENCES users   (username),
+    FOREIGN KEY (selected_species) REFERENCES species (id)
+);
+
+-- SAVED GAME <-> ACTIVE MUTATIONS (Game.activeMutations)
+CREATE TABLE saved_game_mutation (
+    saved_game_id INT NOT NULL,
+    mutation_id   INT NOT NULL,
+    PRIMARY KEY (saved_game_id, mutation_id),
+    FOREIGN KEY (saved_game_id) REFERENCES saved_game (id),
+    FOREIGN KEY (mutation_id)   REFERENCES mutation   (id)
+);
+
+-- SETTINGS
+CREATE TABLE settings (
+    id       INT          NOT NULL AUTO_INCREMENT,
+    username VARCHAR(255) NOT NULL,
+    `key`    VARCHAR(100) NOT NULL,
+    `value`  VARCHAR(255) NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (username) REFERENCES users (username)
+);
+
+-- CHANGELOG
+CREATE TABLE changelog (
+    id         INT      NOT NULL AUTO_INCREMENT,
+    entry      TEXT     NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);

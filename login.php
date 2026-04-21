@@ -1,8 +1,8 @@
 <?php
 $serverName = 'localhost';
 $database   = 'evoDB';
-$dbUser     = 'your_db_user';
-$dbPassword = 'your_db_password';
+$dbUser     = 'root';
+$dbPassword = 'mdonnelly';
 
 header('Content-Type: text/html; charset=utf-8');
 
@@ -21,14 +21,14 @@ if (!$username || !$password) {
 }
 
 try {
-    $dsn = "sqlsrv:Server=$serverName;Database=$database";
+    $dsn = "mysql:host=$serverName;dbname=$database";
     $pdo = new PDO($dsn, $dbUser, $dbPassword, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
     ]);
 
-    $stmt = $pdo->prepare('SELECT Username, PasswordHash FROM dbo.users WHERE Username = :username');
+    $stmt = $pdo->prepare('SELECT username, password FROM users WHERE username = :username');
     $stmt->execute(['username' => $username]);
     $user = $stmt->fetch();
 
@@ -37,13 +37,13 @@ try {
         exit;
     }
 
-    if (!password_verify($password, $user['PasswordHash'])) {
+    if (!password_verify($password, $user['password'])) {
         echo 'Invalid username or password.';
         exit;
     }
 
     session_start();
-    $_SESSION['username'] = $user['Username'];
+    $_SESSION['username'] = $user['username'];
 
     echo 'Login successful';
     // Redirect goes here
