@@ -22,7 +22,26 @@
     <p style="text-align:center; margin-top: 16px;">
       Don't have an account? <a href="register.html" style="color:#7ccfff; text-decoration:none;">Register</a>
     </p>
+    <div style="text-align:center; margin-top: 20px; padding-top: 16px; border-top: 1px solid #333;">
+      <button type="button" id="toggleAdminBtn" onclick="toggleAdmin()" style="background:#555; width:auto; padding:10px 24px; font-size:0.9rem;">Admin Login</button>
+    </div>
+    <div id="adminSection" style="display:none; margin-top:16px;">
+      <div id="adminErrorMessage" class="error" aria-live="polite"></div>
+      <form id="adminLoginForm" action="admin-login.php" method="post">
+        <label for="adminUsername">Admin Username</label>
+        <input id="adminUsername" name="username" type="text" placeholder="Admin username" required />
+        <label for="adminPassword">Admin Password</label>
+        <input id="adminPassword" name="password" type="password" placeholder="Admin password" required />
+        <button type="submit" style="background:#7a5af8;">Sign In as Admin</button>
+      </form>
+    </div>
   </main>
+  <script>
+    function toggleAdmin() {
+      var section = document.getElementById('adminSection');
+      section.style.display = section.style.display === 'none' ? 'block' : 'none';
+    }
+  </script>
   <script src="login.js"></script>
 </body>
 </html>

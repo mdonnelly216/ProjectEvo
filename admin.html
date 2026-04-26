@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<!--
+    Project Evo - admin.html
+
+    Admin panel for managing changelog entries.
+   
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Evo - Admin Panel</title>
+  <style>
+    :root {
+      --bg:      #0a1410;
+      --panel:   #16281c;
+      --accent:  #3ba55d;
+      --hi:      #5fcb80;
+      --text:    #e8f3ec;
+      --muted:   #8cb99a;
+      --border:  #2d8659;
+      --danger:  #d15a5a;
+      --purple:  #7a5af8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      color: var(--purple);
+      font-family: "Impact", "Arial Black", sans-serif;
+      letter-spacing: 2px;
+    }
+    header .meta { color: var(--muted); font-size: 0.9rem; }
+    header a { color: var(--hi); text-decoration: none; margin-left: 16px; font-size: 0.9rem; }
+    main {
+      max-width: 860px;
+      margin: 32px auto;
+      padding: 0 20px 60px;
+    }
+    h2 { color: var(--hi); margin-bottom: 12px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0d1a11;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+    }
+    .btn {
+      padding: 9px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--hi); color: #0a1410; }
+    .btn-danger  { background: var(--danger); color: #fff; }
+    .btn-danger:hover  { opacity: 0.85; }
+    .btn-ghost   { background: transparent; color: var(--hi); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--border); }
+    .msg { margin: 10px 0 0; font-size: 0.9rem; min-height: 20px; }
+    .msg.ok    { color: var(--hi); }
+    .msg.error { color: var(--danger); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 2px solid var(--border);
+      color: var(--muted);
+      font-weight: 600;
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(45,134,89,0.25);
+      vertical-align: top;
+    }
+    td.entry-text { max-width: 480px; white-space: pre-wrap; word-break: break-word; }
+    td.entry-date { color: var(--muted); white-space: nowrap; min-width: 160px; }
+    td.entry-actions { white-space: nowrap; }
+    td.entry-actions button { margin-right: 6px; }
+    .empty-row td { color: var(--muted); text-align: center; padding: 24px; }
+    .edit-inline { display: none; margin-top: 6px; }
+    .edit-inline textarea { min-height: 60px; margin-bottom: 6px; }
+    #notLoggedIn {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    #notLoggedIn p { color: var(--danger); margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Admin Panel</h1>
+  <div>
+    <span class="meta" id="adminTag"></span>
+    <a href="login.html">Log out</a>
+  </div>
+</header>
+
+<main>
+  <div id="notLoggedIn">
+    <p>You must be logged in as an admin to view this page.</p>
+    <a href="login.html" style="color:var(--hi);">&larr; Go to Login</a>
+  </div>
+
+  <div id="adminContent">
+    <div class="card">
+      <h2>Add Changelog Entry</h2>
+      <textarea id="newEntry" placeholder="Describe what changed in this update..."></textarea>
+      <div style="margin-top:10px;">
+        <button class="btn btn-primary" onclick="addEntry()">Add Entry</button>
+      </div>
+      <p class="msg" id="addMsg"></p>
+    </div>
+
+    <div class="card">
+      <h2>Changelog Entries</h2>
+      <table id="changelogTable">
+        <thead>
+          <tr>
+            <th>Entry</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="changelogBody">
+          <tr class="empty-row"><td colspan="3">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+"use strict";
+
+/* Admin session check */
+/* evo.admin is written to sessionStorage by admin-login.php after successful authentication */
+const adminName = sessionStorage.getItem('evo.admin');
+if (!adminName) {
+  document.getElementById('notLoggedIn').style.display = 'block';
+  document.getElementById('adminContent').style.display = 'none';
+} else {
+  document.getElementById('adminTag').textContent = 'Admin: ' + adminName;
+  loadChangelog();
+}
+
+/* Simple HTML escaper for user-generated content */
+function escHtml(str) {
+  return String(str).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]);
+}
+
+/* Format a UTC datetime string to a readable local time */
+function fmtDate(dt) {
+  return new Date(dt).toLocaleString();
+}
+
+/* Set the status message below a form card */
+function setMsg(id, text, isError) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg ' + (isError ? 'error' : 'ok');
+}
+
+/* Fetch all changelog entries from the server and render the table */
+async function loadChangelog() {
+  const tbody = document.getElementById('changelogBody');
+  try {
+    const res = await fetch('get-changelog.php');
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    renderTable(data.entries);
+  } catch (e) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="3">Failed to load entries.</td></tr>';
+  }
+}
+
+/* Build the changelog table rows from the entries array */
+function renderTable(entries) {
+  const tbody = document.getElementById('changelogBody');
+  if (!entries.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="3">No changelog entries yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = entries.map(e => `
+    <tr id="row-${e.id}">
+      <td class="entry-text">
+        <span id="text-${e.id}">${escHtml(e.entry)}</span>
+        <div class="edit-inline" id="edit-${e.id}">
+          <textarea id="editArea-${e.id}">${escHtml(e.entry)}</textarea>
+          <button class="btn btn-primary btn-sm" onclick="saveEdit(${e.id})">Save</button>
+          <button class="btn btn-ghost btn-sm" onclick="cancelEdit(${e.id})">Cancel</button>
+          <p class="msg" id="editMsg-${e.id}"></p>
+        </div>
+      </td>
+      <td class="entry-date">${escHtml(fmtDate(e.created_at))}</td>
+      <td class="entry-actions">
+        <button class="btn btn-ghost" onclick="startEdit(${e.id})">Edit</button>
+        <button class="btn btn-danger" onclick="deleteEntry(${e.id})">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* Show the inline edit form for a row */
+function startEdit(id) {
+  document.getElementById('edit-' + id).style.display = 'block';
+  document.getElementById('text-' + id).style.display = 'none';
+}
+
+/* Hide the edit form and restore the display text */
+function cancelEdit(id) {
+  document.getElementById('edit-' + id).style.display = 'none';
+  document.getElementById('text-' + id).style.display = '';
+}
+
+/* POST the edited entry text to admin.php and update the row in place */
+async function saveEdit(id) {
+  const entry = document.getElementById('editArea-' + id).value.trim();
+  if (!entry) { setMsg('editMsg-' + id, 'Entry cannot be empty.', true); return; }
+  try {
+    const form = new FormData();
+    form.append('action', 'edit');
+    form.append('id', id);
+    form.append('entry', entry);
+    const res = await fetch('admin.php', { method: 'POST', body: form });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    document.getElementById('text-' + id).textContent = entry;
+    cancelEdit(id);
+  } catch (e) {
+    setMsg('editMsg-' + id, 'Failed to save: ' + e.message, true);
+  }
+}
+
+/* delete a changelog entry, then remove its row from the table */
+async function deleteEntry(id) {
+  if (!confirm('Delete this changelog entry?')) return;
+  try {
+    const form = new FormData();
+    form.append('action', 'delete');
+    form.append('id', id);
+    const res = await fetch('admin.php', { method: 'POST', body: form });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    document.getElementById('row-' + id).remove();
+    const tbody = document.getElementById('changelogBody');
+    if (!tbody.querySelector('tr:not(.empty-row)')) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="3">No changelog entries yet.</td></tr>';
+    }
+  } catch (e) {
+    alert('Failed to delete: ' + e.message);
+  }
+}
+
+/* POST a new changelog entry to admin.php and refresh the table */
+async function addEntry() {
+  const entry = document.getElementById('newEntry').value.trim();
+  if (!entry) { setMsg('addMsg', 'Entry text cannot be empty.', true); return; }
+  try {
+    const form = new FormData();
+    form.append('action', 'add');
+    form.append('entry', entry);
+    const res = await fetch('admin.php', { method: 'POST', body: form });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    document.getElementById('newEntry').value = '';
+    setMsg('addMsg', 'Entry added!', false);
+    loadChangelog();
+    setTimeout(() => setMsg('addMsg', '', false), 3000);
+  } catch (e) {
+    setMsg('addMsg', 'Failed to add: ' + e.message, true);
+  }
+}
+</script>
+
+</body>
+</html>

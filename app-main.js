@@ -79,6 +79,32 @@ document.addEventListener("DOMContentLoaded", () => {
                '"': "&quot;", "'": "&#39;" })[c]);
     }
 
+    /* Load and render the changelog on the menu screen */
+    async function loadChangelog() {
+        const container = document.getElementById('changelogList');
+        if (!container) return;
+        try {
+            const res = await fetch('get-changelog.php');
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error);
+            if (!data.entries.length) {
+                container.innerHTML = '<p style="color:var(--evo-muted);font-size:0.9rem;">No entries yet.</p>';
+                return;
+            }
+            container.innerHTML = data.entries.map(e => `
+                <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(45,134,89,0.25);">
+                    <p style="margin:0 0 4px;white-space:pre-wrap;word-break:break-word;">${escapeHtml(e.entry)}</p>
+                    <span style="color:var(--evo-muted);font-size:0.8rem;">${escapeHtml(new Date(e.created_at).toLocaleDateString())}</span>
+                </div>
+            `).join('');
+        } catch (e) {
+            container.innerHTML = '<p style="color:var(--evo-muted);font-size:0.9rem;">Could not load changelog.</p>';
+        }
+    }
+
+    loadChangelog();
+    onShow('menu', loadChangelog);
+
     /* The global EvoApp object that other files will use to access the game*/
     window.EvoApp = {
         game,

@@ -20,7 +20,6 @@
 <div class="app-shell">
 
     <header class="app-header">
-        <h1>Project Evo</h1>
         <div>
             <span class="user-tag" id="userTag">Signed in</span>
             <a class="logout-link" href="login.html">Log out</a>
@@ -29,14 +28,22 @@
 
     <!--SCREEN: Main Menu -->
     <section id="screen-menu" class="screen active">
-        <div class="panel wavy" style="max-width: 420px;">
-            <h2>Project Evo</h2>
-            <ul class="menu-list">
-               
-                <li><button data-nav="creator">Creature Creator</button></li>
-                <li><button data-nav="start">Start New Game</button></li>
-             
-            </ul>
+        <div style="position:relative; display:flex; justify-content:center; align-items:flex-start; min-height:340px;">
+            <!-- Centered game panel -->
+            <div class="panel wavy" style="max-width:420px; width:100%;">
+                <h2>Project Evo</h2>
+                <ul class="menu-list">
+                    <li><button data-nav="creator">Creature Creator</button></li>
+                    <li><button data-nav="start">Start New Game</button></li>
+                </ul>
+            </div>
+            <!-- Changelog pinned to the right -->
+            <div class="panel" style="position:absolute; right:0; top:0; width:300px;">
+                <h3 style="margin:0 0 12px; color:var(--evo-accent-hi);">Changelog</h3>
+                <div id="changelogList" style="max-height:300px; overflow-y:auto;">
+                    <p style="color:var(--evo-muted); font-size:0.9rem;">Loading...</p>
+                </div>
+            </div>
         </div>
     </section>
 
