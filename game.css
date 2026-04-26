@@ -1,0 +1,370 @@
+/* 
+ * game.css
+ * Project Evo - Game screen styles.
+ */
+
+/* 
+ * CSS variables
+*/
+:root {
+    --evo-bg:         #0a1410;   /* deepest background */
+    --evo-panel:      #16281c;   /* panel background */
+    --evo-panel-alt:  #1f3a2a;   /* panel buttons */
+    --evo-accent:     #3ba55d;   /* primary emerald */
+    --evo-accent-hi:  #5fcb80;   /* hover/active  */
+    --evo-text:       #e8f3ec;   /* off-white primary text */
+    --evo-muted:      #8cb99a;   /* secondary text */
+    --evo-border:     #2d8659;   /* accent border */
+    --evo-danger:     #d15a5a;   /* game-over accents */
+    --evo-good:       #7bc68e;   /* "stage cleared" accent */
+    --evo-wave:       #2a5a3a;   /* decorative wave colour */
+    --evo-font-head:  "Impact", "Franklin Gothic Bold", "Arial Black", sans-serif;
+    --evo-font-body:  "Trebuchet MS", "Lucida Sans", Arial, sans-serif;
+}
+
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0; padding: 0;
+    background: var(--evo-bg);
+    color: var(--evo-text);
+    font-family: var(--evo-font-body);
+    min-height: 100vh;
+}
+
+.app-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+}
+
+.app-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(91, 179, 125, 0.2);
+}
+.app-header h1 {
+    font-family: var(--evo-font-head);
+    letter-spacing: 2px;
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--evo-accent-hi);
+}
+.app-header .user-tag {
+    color: var(--evo-muted);
+    font-size: 0.9rem;
+}
+.app-header .logout-link {
+    color: var(--evo-accent-hi);
+    text-decoration: none;
+    margin-left: 12px;
+}
+
+/* Screen switching */
+.screen {
+    display: none;
+    animation: fade-in 0.28s ease-out;
+}
+.screen.active { display: block; }
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+
+.panel {
+    background: var(--evo-panel);
+    border: 2px solid var(--evo-border);
+    border-radius: 14px;
+    padding: 26px 28px;
+    margin: 0 auto 18px;
+    position: relative;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+}
+
+.panel h2 {
+    font-family: var(--evo-font-head);
+    letter-spacing: 1.5px;
+    text-align: center;
+    margin: 4px 0 22px;
+    font-size: 1.6rem;
+    color: var(--evo-text);
+}
+.panel h2 .accent { color: var(--evo-accent-hi); text-decoration: underline; }
+
+
+.panel.wavy::before,
+.panel.wavy::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; height: 28px;
+    background: var(--evo-wave);
+    opacity: 0.85;
+    -webkit-mask: radial-gradient(18px at 18px 0, #0000 98%, #000) 0 0/36px 100%;
+            mask: radial-gradient(18px at 18px 0, #0000 98%, #000) 0 0/36px 100%;
+}
+.panel.wavy::before { top: -18px; }
+.panel.wavy::after  { bottom: -18px; transform: rotate(180deg); }
+
+/* Buttons */
+.btn {
+    background: var(--evo-accent);
+    color: #0d1a11;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-weight: 700;
+    font-family: var(--evo-font-body);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+.btn:hover { background: var(--evo-accent-hi); }
+.btn:active { transform: translateY(1px); }
+.btn-wide { width: 100%; }
+.btn-ghost {
+    background: transparent;
+    color: var(--evo-accent-hi);
+    border: 2px solid var(--evo-border);
+}
+.btn-ghost:hover { background: rgba(91, 179, 125, 0.1); }
+.btn-danger { background: var(--evo-danger); color: #fff; }
+.btn-small { padding: 6px 14px; font-size: 0.9rem; }
+
+/* Main menu  */
+#screen-menu .menu-list {
+    list-style: none; padding: 0; margin: 10px 0 0;
+    display: flex; flex-direction: column; gap: 10px;
+}
+#screen-menu .menu-list button {
+    width: 100%;
+    padding: 14px 18px;
+    background: var(--evo-panel-alt);
+    color: var(--evo-text);
+    border: 2px solid var(--evo-border);
+    border-radius: 6px;
+    font-family: var(--evo-font-head);
+    letter-spacing: 2px;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+#screen-menu .menu-list button:hover {
+    background: var(--evo-accent);
+    color: #0d1a11;
+}
+
+/* Creature Creator */
+.creator-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 20px;
+    align-items: start;
+}
+.creator-preview {
+    text-align: center;
+    background: #0d1a11;
+    border: 2px solid var(--evo-border);
+    border-radius: 10px;
+    padding: 22px;
+}
+.creator-preview .creature-face {
+    width: 120px; height: 120px; margin: 0 auto;
+    display: block;
+}
+.creator-form label {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 10px;
+    background: var(--evo-panel-alt);
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+}
+.creator-form label input,
+.creator-form label select {
+    background: #0d1a11;
+    color: var(--evo-text);
+    border: 1px solid var(--evo-border);
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-family: inherit;
+}
+
+/* Select creature */
+.species-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 14px;
+}
+.species-card, .species-card-add {
+    background: var(--evo-panel-alt);
+    border: 2px solid var(--evo-border);
+    border-radius: 8px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--evo-text);
+    font-family: inherit;
+    transition: transform 0.1s;
+}
+.species-card:hover, .species-card-add:hover {
+    transform: translateY(-3px);
+    border-color: var(--evo-accent-hi);
+}
+.species-card .name { margin-top: 8px; font-weight: 700; color: var(--evo-accent-hi); }
+.species-card-add { font-size: 2.4rem; color: var(--evo-accent-hi); }
+
+/* Allocate Your Stats */
+.stat-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 40px auto;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    background: var(--evo-panel-alt);
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-family: var(--evo-font-head);
+    letter-spacing: 1px;
+}
+.stat-row .label { color: var(--evo-accent-hi); font-size: 1.05rem; }
+.stat-row .bar {
+    position: relative;
+    background: #0d1a11;
+    border: 1px solid var(--evo-border);
+    height: 18px; border-radius: 9px;
+    overflow: hidden;
+}
+.stat-row .bar .fill {
+    background: linear-gradient(90deg, var(--evo-accent), var(--evo-accent-hi));
+    height: 100%;
+    transition: width 0.15s;
+}
+.stat-row .value { text-align: right; color: var(--evo-text); }
+.stat-row .pm button {
+    background: var(--evo-panel);
+    color: var(--evo-accent-hi);
+    border: 1px solid var(--evo-border);
+    width: 28px; height: 28px; border-radius: 4px;
+    cursor: pointer; font-weight: 700;
+}
+.stat-row .pm button:hover { background: var(--evo-accent); color: #0d1a11; }
+
+.remaining-badge {
+    display: inline-block;
+    background: var(--evo-panel-alt);
+    border: 2px solid var(--evo-border);
+    padding: 6px 14px;
+    border-radius: 999px;
+    color: var(--evo-accent-hi);
+    font-family: var(--evo-font-head);
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+}
+
+/* Game screen the simulation */
+.game-stage {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+.game-canvas-wrap {
+    background: #000;
+    border: 3px solid var(--evo-border);
+    border-radius: 10px;
+    padding: 6px;
+    overflow: hidden;
+}
+#gameCanvas {
+    width: 100%;
+    height: 420px;
+    display: block;
+    image-rendering: pixelated;
+}
+.stage-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--evo-muted);
+    font-family: var(--evo-font-head);
+    letter-spacing: 1.5px;
+    font-size: 1.1rem;
+}
+.hp-bar {
+    width: 180px; height: 14px;
+    background: #330000;
+    border: 1px solid var(--evo-danger);
+    border-radius: 7px;
+    overflow: hidden;
+}
+.hp-bar .fill { background: var(--evo-danger); height: 100%; transition: width 0.2s; }
+
+.game-hud {
+    display: flex; gap: 18px; flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: var(--evo-panel-alt);
+    border-radius: 8px;
+    font-family: var(--evo-font-head);
+    letter-spacing: 1.2px;
+}
+.game-hud span { color: var(--evo-accent-hi); }
+
+/* Stage Cleared - mutation + stat upgrade  */
+.cleared-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.cleared-grid h3 {
+    font-family: var(--evo-font-head);
+    letter-spacing: 1.5px;
+    color: var(--evo-accent-hi);
+    margin-top: 0;
+}
+.cleared-grid h3 .accent { color: var(--evo-good); }
+.mutation-list { display: flex; flex-direction: column; gap: 8px; }
+.mutation-card {
+    background: var(--evo-panel-alt);
+    border: 2px solid var(--evo-border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--evo-text);
+    font-family: inherit;
+    transition: transform 0.1s, background 0.15s;
+}
+.mutation-card:hover { transform: translateY(-2px); background: var(--evo-accent); color: #0d1a11; }
+.mutation-card.selected {
+    background: var(--evo-accent);
+    color: #0d1a11;
+    border-color: var(--evo-accent-hi);
+}
+.mutation-card .name { font-weight: 700; font-size: 1.05rem; }
+.mutation-card .blurb { font-size: 0.85rem; opacity: 0.85; }
+
+/* popup / status messages */
+.popup {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: var(--evo-panel);
+    color: var(--evo-text);
+    border: 2px solid var(--evo-accent-hi);
+    border-radius: 6px;
+    padding: 10px 18px;
+    z-index: 1000;
+    animation: popup-in 0.3s ease-out;
+}
+.popup.error { border-color: var(--evo-danger); color: var(--evo-danger); }
+@keyframes popup-in {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 720px) {
+    .creator-grid, .cleared-grid { grid-template-columns: 1fr; }
+    #gameCanvas { height: 320px; }
+}

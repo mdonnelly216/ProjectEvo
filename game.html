@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Evo</title>
+    <link rel="stylesheet" href="game.css" />
+    <!--
+        Project Evo - game 
+
+        The three script tags at the end load in order:
+            game-data.js    -> constants (TRAITS, MUTATIONS, STAGES)
+            game-classes.js -> domain objects 
+            game-engine.js  -> Simulation 
+            game-app.js     -> controller
+    -->
+</head>
+<body>
+
+<div class="app-shell">
+
+    <header class="app-header">
+        <h1>Project Evo</h1>
+        <div>
+            <span class="user-tag" id="userTag">Signed in</span>
+            <a class="logout-link" href="login.html">Log out</a>
+        </div>
+    </header>
+
+    <!--SCREEN: Main Menu -->
+    <section id="screen-menu" class="screen active">
+        <div class="panel wavy" style="max-width: 420px;">
+            <h2>Project Evo</h2>
+            <ul class="menu-list">
+               
+                <li><button data-nav="creator">Creature Creator</button></li>
+                <li><button data-nav="start">Start New Game</button></li>
+             
+            </ul>
+        </div>
+    </section>
+
+
+    <!--SCREEN: Creature Creator -->
+    <section id="screen-creator" class="screen">
+        <div class="panel wavy" style="max-width: 720px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <button class="btn btn-small btn-ghost" data-nav="menu">Back</button>
+                <h2 style="margin:0;">Creature Creator</h2>
+                <button class="btn btn-small" id="btnCreatorConfirm">Confirm</button>
+            </div>
+
+            <div class="creator-grid">
+                <!--preview of the creature the player is designing-->
+                <div class="creator-preview">
+                    <svg class="creature-face" viewBox="0 0 120 120" id="creaturePreview">
+                        <!-- body -->
+                        <circle cx="60" cy="70" r="44" fill="#e87a3a" id="prevHead"/>
+                        <!-- spikes / feature -->
+                        <polygon points="30,40 45,10 60,38 75,10 90,40" fill="#c0602b" id="prevFeature"/>
+                        <!-- eyes -->
+                        <circle cx="48" cy="66" r="5" fill="#111" id="prevEyeL"/>
+                        <circle cx="72" cy="66" r="5" fill="#111" id="prevEyeR"/>
+                        <!-- beak -->
+                        <polygon points="55,82 65,82 60,95" fill="#c5a15b"/>
+                    </svg>
+                    <p style="color:var(--evo-muted);margin:10px 0 0;font-size:0.85rem;">Live preview</p>
+                </div>
+
+                <!-- Form fields -->
+                <div class="creator-form">
+                    <label>Name:        <input type="text" id="creatorName" placeholder="Species name" maxlength="24" /></label>
+                    <label>Head Shape:  <select id="creatorHeadShape">
+                                          <option value="round">Round</option>
+                                          <option value="oval">Oval</option>
+                                          <option value="square">Square</option>
+                                        </select></label>
+                    <label>Head Color:  <input type="color" id="creatorHeadColor" value="#e87a3a" /></label>
+                    <label>Feature:     <select id="creatorFeature">
+                                          <option value="spikes">Spikes</option>
+                                          <option value="horns">Horns</option>
+                                          <option value="crest">Crest</option>
+                                        </select></label>
+                    <label>Feature Color: <input type="color" id="creatorFeatureColor" value="#c0602b" /></label>
+                    <label>Eye Shape:   <select id="creatorEyeShape">
+                                          <option value="round">Round</option>
+                                          <option value="slit">Slit</option>
+                                        </select></label>
+                    <label>Eye Color:   <input type="color" id="creatorEyeColor" value="#111111" /></label>
+                    <label>Animal Type: <select id="creatorType">
+                                          <option value="Bird">Bird</option>
+                                          <option value="Mammal">Mammal</option>
+                                          <option value="Reptile">Reptile</option>
+                                          <option value="Amphibian">Amphibian</option>
+                                        </select></label>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--SCREEN: Select Creature -->
+    <section id="screen-select" class="screen">
+        <div class="panel wavy" style="max-width: 620px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                <button class="btn btn-small btn-ghost" data-nav="menu">Back</button>
+                <h2 style="margin:0;">Select Creature</h2>
+                <span style="width:54px;"></span>
+            </div>
+            <div id="speciesGrid" class="species-grid"><!-- filled in JS --></div>
+        </div>
+    </section>
+
+    <!--SCREEN: Allocate Your Stats -->
+    <section id="screen-allocate" class="screen">
+        <div class="panel wavy" style="max-width: 520px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                <button class="btn btn-small btn-ghost" id="allocCancel">Cancel</button>
+                <h2 style="margin:0;">Allocate Your Stats</h2>
+                <span style="width:54px;"></span>
+            </div>
+            <div style="text-align:center;">
+                <span class="remaining-badge">Remaining: <span id="allocRemaining">0</span></span>
+            </div>
+            <div id="allocRows"><!-- stat rows rendered by JS --></div>
+            <div style="display:flex;gap:10px;justify-content:center;margin-top:18px;">
+                <button class="btn btn-ghost" id="allocRandomize">Randomize</button>
+                <button class="btn" id="allocConfirm">Confirm</button>
+            </div>
+        </div>
+    </section>
+
+    <!--SCREEN: Game -->
+    <section id="screen-game" class="screen">
+        <div class="panel">
+            <div class="game-hud">
+                <div>Score: <span id="hudScore">0</span></div>
+                <div>Population: <span id="hudPop">0</span></div>
+                <div>Predators: <span id="hudPred">0</span></div>
+                <div>Tick: <span id="hudTick">0</span></div>
+            </div>
+
+            <div class="game-canvas-wrap">
+                <canvas id="gameCanvas" width="800" height="640"></canvas>
+            </div>
+
+            <div class="stage-footer">
+                <div class="hp-bar" title="Average population HP"><div class="fill" id="avgHpFill" style="width:100%"></div></div>
+                <div id="stageLabel">Stage 1 - Grasslands</div>
+            </div>
+
+            <div style="display:flex;gap:10px;justify-content:space-between;margin-top:12px;">
+                <button class="btn btn-ghost btn-small" id="gameAbort">Abort Run</button>
+                <button class="btn btn-small" id="gameStart">Start Simulation</button>
+            </div>
+        </div>
+    </section>
+
+    <!--SCREEN: Stage Cleared -->
+    <section id="screen-cleared" class="screen">
+        <div class="panel wavy">
+            <h2>Stage Cleared!</h2>
+            <div class="cleared-grid">
+                <div>
+                    <h3>Select a <span class="accent">Mutation</span></h3>
+                    <div class="mutation-list" id="mutationList"><!-- JS fills --></div>
+                </div>
+                <div>
+                    <h3>Upgrade Your Stats</h3>
+                    <span class="remaining-badge">Remaining: <span id="upgradeRemaining">15</span></span>
+                    <div id="upgradeRows"><!-- JS fills --></div>
+                </div>
+            </div>
+            <div style="text-align:center;margin-top:18px;">
+                <button class="btn" id="clearedConfirm">Confirm &amp; Continue</button>
+            </div>
+        </div>
+    </section>
+
+    <!--SCREEN: Game Over -->
+    <section id="screen-gameover" class="screen">
+        <div class="panel wavy" style="max-width: 460px; text-align:center;">
+            <h2 style="color: var(--evo-danger);">Game Over</h2>
+            <p>Your population dropped below survival threshold.</p>
+            <p>Final Score: <strong id="goScore">0</strong></p>
+            <p>Reached: <strong id="goStage">Stage 1</strong></p>
+
+            <input type="text" id="goName" placeholder="Name for the leaderboard"
+                   maxlength="20"
+                   style="width:100%;padding:10px;border-radius:6px;border:1px solid var(--evo-border);background:#0d1a11;color:var(--evo-text);margin-bottom:10px;" />
+            <div style="display:flex;gap:10px;justify-content:center;">
+                <button class="btn btn-ghost" id="goSkip">Skip</button>
+                <button class="btn" id="goSubmit">Submit Score</button>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- Popup messages. -->
+<div id="popupRoot"></div>
+
+<script src="game-data.js"></script>
+<script src="game-classes.js"></script>
+<script src="game-engine.js"></script>
+<script src="app-main.js"></script>
+<script src="app-creator.js"></script>
+<script src="app-allocate.js"></script>
+<script src="app-simulation.js"></script>
+<script src="app-cleared.js"></script>
+<script src="app-gameover.js"></script>
+
+
+</body>
+</html>
