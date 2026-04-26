@@ -24,9 +24,29 @@ document.addEventListener("DOMContentLoaded", () => {
         EvoApp.showScreen("gameover");
     };
 
-    $btnSubmit.addEventListener("click", () => {
-        
-        EvoApp.showScreen("menu");
+    $btnSubmit.addEventListener("click", async () => {
+        const name = $name.value.trim();
+        if (!name) { $name.focus(); return; }
+
+        const game = EvoApp.game;
+        const form = new FormData();
+        form.append('name',         name);
+        form.append('score',        game.score);
+        form.append('level',        game.currentLevel);
+        form.append('species_name', game.activeSpecies ? game.activeSpecies.name : 'Unknown');
+        form.append('username',     game.username !== 'guest' ? game.username : '');
+
+        $btnSubmit.disabled = true;
+        try {
+            const res  = await fetch('submit-score.php', { method: 'POST', body: form });
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error);
+        } catch (e) {
+            console.error('Score submission failed:', e);
+        } finally {
+            $btnSubmit.disabled = false;
+            EvoApp.showScreen("menu");
+        }
     });
 
     /* Skip back to menu */
