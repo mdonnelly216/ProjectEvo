@@ -46,9 +46,14 @@ try {
     $_SESSION['username'] = $user['username'];
 
     echo 'Login successful';
-    // Redirect goes here
-    
+    // Redirect 
+    $name = json_encode($user['username']);
+    echo "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Signing in...</title></head><body>";
+    echo "<script>sessionStorage.setItem('evo.username', $name); location.replace('game.html');</script>";
+    echo "<noscript>Login successful. <a href='game.html'>Continue to the game</a>.</noscript>";
+    echo "</body></html>";
     exit;
+    
 } catch (PDOException $ex) {
     error_log('Database error: ' . $ex->getMessage());
     echo 'An error occurred while trying to authenticate.';
