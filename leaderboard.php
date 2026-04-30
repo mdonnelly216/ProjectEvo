@@ -17,7 +17,14 @@ try {
         ORDER BY score DESC"
     );
     $stmt->execute();
-    $rows = json_encode($stmt->fetchAll());
+    $rowsArray = $stmt->fetchAll();
+    $rows = json_encode($rowsArray);
+
+    if (isset($_GET['json'])) {//render table in admin panel
+        header('Content-Type: application/json');
+        echo $rows;
+        exit;
+    }
 } catch (PDOException $ex) {
     error_log('Database error: ' . $ex->getMessage());
     $rows = "[]";
