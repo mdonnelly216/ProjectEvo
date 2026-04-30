@@ -92,6 +92,7 @@ try {
         <td>${(row.username)}</td>
     </tr>`).join('') : '<tr><td colspan="6" class="empty">No entries found.</td></tr>';
 </script>
+<script src="settings.js"></script>
 </body>
 </html>
 
