@@ -162,6 +162,27 @@
         </tbody>
       </table>
     </div>
+      
+    <div class="card">
+        <h2>Leaderboard Entries</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Score</th>
+                    <th>Species ID</th>
+                    <th>Level</th>
+                    <th>Username</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody">
+                <tr class="empty-row"><td colspan="7">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+      
   </div>
 </main>
 
@@ -177,6 +198,7 @@ if (!adminName) {
 } else {
   document.getElementById('adminTag').textContent = 'Admin: ' + adminName;
   loadChangelog();
+  loadLeaderboard();
 }
 
 /* Simple HTML escaper for user-generated content */
@@ -237,6 +259,25 @@ function renderTable(entries) {
   `).join('');
 }
 
+/* Render leaderboard */
+async function loadLeaderboard() {
+const res = await fetch('leaderboard.php?json=1');
+const rows = await res.json();
+document.getElementById('resultsBody').innerHTML = rows.length
+  ? rows.map(row => `
+    <tr id="lb-row-${row.id}">
+      <td>${row.id}</td>
+      <td>${row.name}</td>
+      <td>${row.score}</td>
+      <td>${row.species_id}</td>
+      <td>${row.level}</td>
+      <td>${row.username}</td>
+      <td><button class="btn btn-danger" onclick="deleteLeaderboardEntry(${row.id})">Delete</button></td>
+    </tr>
+  `).join('')
+  : '<tr class="empty-row"><td colspan="7">No leaderboard entries yet found.</td></tr>';
+}    
+    
 /* Show the inline edit form for a row */
 function startEdit(id) {
   document.getElementById('edit-' + id).style.display = 'block';
@@ -282,6 +323,26 @@ async function deleteEntry(id) {
     const tbody = document.getElementById('changelogBody');
     if (!tbody.querySelector('tr:not(.empty-row)')) {
       tbody.innerHTML = '<tr class="empty-row"><td colspan="3">No changelog entries yet.</td></tr>';
+    }
+  } catch (e) {
+    alert('Failed to delete: ' + e.message);
+  }
+}
+
+/* delete a leaderboard entry, then remove its row from the table */
+async function deleteLeaderboardEntry(id) {
+  if (!confirm('Delete this leaderboard entry?')) return;
+  try {
+    const form = new FormData();
+    form.append('action', 'deleteLeaderboard');
+    form.append('id', id);
+    const res = await fetch('admin.php', { method: 'POST', body: form });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    document.getElementById('lb-row-' + id).remove();
+    const tbody = document.getElementById('resultsBody');
+    if (!tbody.querySelector('tr:not(.empty-row)')) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No leaderboard entries yet.</td></tr>';
     }
   } catch (e) {
     alert('Failed to delete: ' + e.message);
