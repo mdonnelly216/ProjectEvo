@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Settings</title>
+    <link rel="stylesheet" href="game.css" />
+    <!--
+    -->
+</head>
+<body>
+<div class="app-shell">
+    <header class="app-header">
+        <div>
+            <span class="user-tag" id="userTag">Signed in</span>
+            <a class="logout-link" href="login.html">Log out</a>
+            <span>
+        </div>
+    </header>
+
+    <section id="screen-menu" class="screen active">
+        <div style="position:relative; display:flex; justify-content:center; align-items:flex-start; min-height:340px;">
+            <!-- Centered game panel -->
+            <div class="panel wavy" style="max-width:420px; width:100%;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                    <a href="game.html" class="btn btn-small btn-ghost">Back</a>
+                    <h2 style="margin:0;">Resolution</h2>
+                    <span style="width:54px;"></span>
+                </div>
+                <ul class="menu-list">
+                    <li><button onclick="biggestZoom()">Larger</button></li>
+                    <li><button onclick="bigZoom()">Large</button></li>
+                    <li><button onclick="normalZoom()">Normal</button></li>
+                    <li><button onclick="smallZoom()">Smaller</button></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>
+<script src="settings.js"></script>
+</body>
+</html>
