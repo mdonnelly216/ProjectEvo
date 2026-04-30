@@ -50,7 +50,14 @@ try {
         $stmt = $pdo->prepare('DELETE FROM changelog WHERE id = :id');
         $stmt->execute(['id' => $id]);
         echo json_encode(['ok' => true]);
-
+    } elseif ($action === 'deleteLeaderboard') {
+        if (!$id) {
+            echo json_encode(['ok' => false, 'error' => 'ID is required.']);
+            exit;
+        }
+        $stmt = $pdo->prepare('DELETE FROM leaderboard_entry WHERE id = :id');
+        $stmt->execute(['id' => $id]);
+        echo json_encode(['ok' => true]);
     } else {
         echo json_encode(['ok' => false, 'error' => 'Unknown action.']);
     }
